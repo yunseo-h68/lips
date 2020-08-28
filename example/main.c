@@ -13,6 +13,9 @@ struct lips_args* init(int argc, char* argv[])
 	lips_add_option(args, "v");
 	lips_add_option_long(args, "version");
 	
+	// Add --echo Option
+	lips_add_option_long(args, "echo");
+	
 	// Add hello Subcommand
 	lips_add_subcommand(args, "hello");
 	
@@ -29,6 +32,7 @@ void print_help() {
 	printf("Options:\n");
 	printf("\t-h, --help : Display this information\n");
 	printf("\t-v, --version : Display version\n");
+	printf("\t    --echo=[STRING] : Display [STRING]\n");
 	printf("\n");
 	printf("Subcommands:\n");
 	printf("\thello : print 'Hello'\n");
@@ -47,8 +51,22 @@ void print_world() {
 	printf("World\n");
 }
 
+void option_echo(struct lips_args* args) {
+	char* str = lips_get_option_long_value(args, "echo");
+	if (str == NULL) {
+		print_help();
+		return;
+	}
+	printf("%s\n", str);
+}
+
 int main(int argc, char* argv[]) {
 	struct lips_args* args = init(argc, argv);
+
+	if (argc == 1) {
+		print_help();
+		return 0;
+	}
 
 	// Subcommands
 	if (lips_is_exist_subcommand(args,"hello")) {
@@ -64,6 +82,8 @@ int main(int argc, char* argv[]) {
 		print_help();
 	} else if (lips_is_exist_option(args, "v") || lips_is_exist_option_long(args, "version")) {
 		print_version();
+	} else if (lips_is_exist_option_long(args, "echo")) {
+		option_echo(args);
 	}
 
 	delete_lips_args(args);

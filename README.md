@@ -6,8 +6,10 @@ Simple library for parsing command-line arguments.
 
 ```
 $ git clone https://github.com/yunseo-h68/lips.git
+
 $ make example
-$ ./bin/example --help
+
+$ ./bin/example
 example | example of lips
 
 Usage:
@@ -16,6 +18,7 @@ Usage:
 Options:
 	-h, --help : Display this information
 	-v, --version : Display version
+	    --echo=[STRING] : Display [STRING]
 
 Subcommands:
 	hello : print 'Hello'
@@ -23,8 +26,13 @@ Subcommands:
 
 $ ./bin/example hello
 Hello
+
+$ ./bin/example --echo='hello world'
+hello world
+
 $ ./bin/example -v
 version 0.1.0
+
 ```
 
 ## License
