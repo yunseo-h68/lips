@@ -40,7 +40,7 @@ void print_help() {
 }
 
 void print_version() {
-	printf("version 0.1.0\n");
+	printf("version 0.1.3\n");
 }
 
 void print_hello() {

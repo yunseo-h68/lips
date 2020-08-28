@@ -1,6 +1,6 @@
 CC                = gcc
 LIB_TARGET        = liblips
-LIB_VERSION       = 0.1.0
+LIB_VERSION       = 0.1.3
 LIB_VERSION_MAJOR = 0
 LIB_DIR           = lib
 SRC_DIR           = src
