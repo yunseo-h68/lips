@@ -29,7 +29,8 @@ struct lips_args {
 };
 
 static int argv_type(const char* argv);
-static char* parse_name(const char* argv);
+static int type_is_option(const int type);
+static char* parse_name(const char* argv, const int type);
 static int parse_option_value(struct lips_option* option, const char* argv);
 static struct lips_option* get_option(struct lips_args* args, const char* name, int option_type);
 static struct lips_subcommand* get_subcommand(struct lips_args* args, const char* name);
@@ -42,6 +43,8 @@ int lips_is_exist_subcommand(struct lips_args* args, const char* name);
 int lips_add_option(struct lips_args* args, const char* name);
 int lips_add_option_long(struct lips_args* args, const char* name);
 int lips_add_subcommand(struct lips_args* args, const char* name);
+char* lips_get_option_value(struct lips_args* args, const char* name);
+char* lips_get_option_long_value(struct lips_args* args, const char* name);
 void lips_parse_args(struct lips_args* args, const int argc, char* argv[]);
 
 struct lips_args* new_lips_args();

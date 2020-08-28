@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "lips.h"
@@ -17,24 +16,39 @@ static int argv_type(const char* argv)
 	return OTHER_TYPE;
 }
 
-static char* parse_name(const char* argv)
+static int type_is_option(const int type)
+{
+	return type == OPTION_SHORT || type == OPTION_LONG;
+}
+
+static char* parse_name(const char* argv, const int type)
 {
 	char* temp = NULL;
 	int i = 0;
 	int j = 0;
 
-	while (argv[i] == '-') i++;
+	while (type_is_option(type) && argv[i] == '-') i++;
 	j = i;
-	while (argv[j] != '=' && strlen(argv) > j) j++;
+
+	while (strlen(argv) > j) {
+		if (type_is_option(type) && argv[j] == '=') {
+			break;
+		}
+		j++;
+	}
 
 	j -= i;
 	temp = (char*)malloc(sizeof(char) * (j + 1));
 	j = 0;
 
-	while (argv[i] != '=' && strlen(argv) != i) {
+	while (strlen(argv) != i) {
+		if (type_is_option(type) && argv[i] == '=') {
+			break;
+		}
 		temp[j++] = argv[i++];
 	}
 	temp[j] = '\0';
+
 	return temp;
 }
 
@@ -65,6 +79,10 @@ static struct lips_option* get_option(struct lips_args* args, const char* name, 
 {
 	int i;
 
+	if (args == NULL || strlen(name) == 0) {
+		return NULL;
+	}
+
 	for (i = 0; i < args->count_options; i++) {
 		if (args->options[i]->type == option_type &&
 			!strcmp(name, args->options[i]->name)) {
@@ -79,6 +97,10 @@ static struct lips_subcommand* get_subcommand(struct lips_args* args, const char
 {
 	int i;
 
+	if (args == NULL || strlen(name) == 0) {
+		return NULL;
+	}
+
 	for (i = 0; i < args->count_subcommands; i++) {
 		if (!strcmp(name, args->subcommands[i]->name)) {
 			return args->subcommands[i];
@@ -90,6 +112,10 @@ static struct lips_subcommand* get_subcommand(struct lips_args* args, const char
 
 static int add_option(struct lips_args* args, const char* name, int option_type)
 {
+	if (args == NULL || strlen(name) == 0) {
+		return -1;
+	}
+
 	(args->count_options)++;
 
 	if (option_type == OPTION_LONG) {
@@ -109,6 +135,7 @@ static int add_option(struct lips_args* args, const char* name, int option_type)
 	new_option->type = option_type;
 	new_option->name = (char*)malloc(sizeof(char) * strlen(name));
 	strcpy(new_option->name, name);
+	new_option->value = NULL;
 
 	args->options[args->count_options - 1] = new_option;
 	return 0;
@@ -116,6 +143,10 @@ static int add_option(struct lips_args* args, const char* name, int option_type)
 
 static int add_subcommand(struct lips_args* args, const char* name)
 {
+	if (args == NULL || strlen(name) == 0) {
+		return -1;
+	}
+
 	(args->count_subcommands)++;
 
 	if (args->count_subcommands == 1) {
@@ -181,6 +212,16 @@ int lips_add_subcommand(struct lips_args* args, const char* name)
 	return add_subcommand(args, name);
 }
 
+char* lips_get_option_value(struct lips_args* args, const char* name)
+{
+	return get_option(args, name, OPTION_SHORT)->value;
+}
+
+char* lips_get_option_long_value(struct lips_args* args, const char* name)
+{
+	return get_option(args, name, OPTION_LONG)->value;
+}
+
 void lips_parse_args(struct lips_args* args, const int argc, char* argv[])
 {
 	int i = 0;
@@ -191,7 +232,8 @@ void lips_parse_args(struct lips_args* args, const int argc, char* argv[])
 
 	for (i = 1; i < argc; i++) {
 		type = argv_type(argv[i]);
-		name = parse_name(argv[i]); 
+		name = parse_name(argv[i], type);
+
 		switch (type) {
 			case OPTION_LONG:
 			case OPTION_SHORT:
@@ -237,6 +279,12 @@ void delete_lips_args(struct lips_args* args)
 	
 	if (args->options != NULL) {
 		for (i = 0; i < args->count_options; i++) {
+			if (args->options[i]->name != NULL) {
+				free(args->options[i]->name);
+			}
+			if (args->options[i]->value != NULL) {
+				free(args->options[i]->value);
+			}
 			free(args->options[i]);
 		}
 		free(args->options);
@@ -245,6 +293,9 @@ void delete_lips_args(struct lips_args* args)
 
 	if (args->subcommands != NULL) {
 		for (i = 0; i < args->count_subcommands; i++) {
+			if (args->subcommands[i]->name != NULL) {
+				free(args->subcommands[i]->name);
+			}
 			free(args->subcommands[i]);
 		}
 		free(args->subcommands);
