@@ -208,11 +208,12 @@ void parse_args(struct lips_args* args, const int argc, char* argv[])
 			case OPTION_LONG:
 			case OPTION_SHORT:
 				option_temp = get_option(args, name, type);
-				if (option_temp == NULL) {
+				if (option_temp != NULL) {
+					option_temp->is_exist = 1;
+					parse_option_value(option_temp, argv[i]);
 					break;
 				}
-				option_temp->is_exist = 1;
-				parse_option_value(option_temp, argv[i]);
+				add_other_args(args, argv[i]);
 				break;
 			case SUBCOMMAND:
 				if (!check_subcommand) {
@@ -224,7 +225,7 @@ void parse_args(struct lips_args* args, const int argc, char* argv[])
 						break;
 					}
 				}
-				add_other_args(args, name);
+				add_other_args(args, argv[i]);
 				break;
 		}
 		SAFE_FREE(name)
