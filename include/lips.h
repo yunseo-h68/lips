@@ -18,6 +18,10 @@ struct lips_args {
 	int count_options_long;
 	int count_options_short;
 	int count_subcommands;
+	int count_other_args;
+
+	char* subcommand;
+	char** other_args;
 
 	struct lips_option** options;
 	struct lips_subcommand** subcommands;
