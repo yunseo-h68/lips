@@ -1,5 +1,6 @@
 CC                = gcc
-LIB_TARGET        = liblips
+LIB_NAME          = lips
+LIB_TARGET        = lib$(LIB_NAME)
 LIB_VERSION       = 0.1.6
 LIB_VERSION_MAJOR = 0
 LIB_DIR           = lib
@@ -36,7 +37,7 @@ $(EXAMPLE_TARGET): $(LIB_TARGET)
 ifeq (exist, $(shell [ ! -d ./bin ] && echo exist)) 
 	mkdir bin
 endif 
-	$(CC) -o $@ $(EXAMPLE_DIR)/$(SRCS) -I. ./$(LIB_DIR)/$(LIB_TARGET).so.$(LIB_VERSION) $(LINK_LIBS)
+	$(CC) -o $@ $(EXAMPLE_DIR)/$(SRCS) -L./lib -l$(LIB_NAME)
 
 clean:
 	rm -f *.o $(LIB_DIR)/$(LIB_TARGET).* bin/*
