@@ -23,6 +23,8 @@ Options:
 Subcommands:
 	hello : print 'Hello'
 	world : print 'World'
+	test  : print subcommand and other arguments
+
 
 $ ./bin/example hello
 Hello
@@ -30,8 +32,16 @@ Hello
 $ ./bin/example --echo='hello world'
 hello world
 
+$ ./bin/example test hello world
+
+TEST - Print other arguments(not subcommand, not options)
+- hello
+- world
+
+Subcommand : test
+
 $ ./bin/example -v
-version 0.1.3
+version 0.1.5
 
 ```
 
