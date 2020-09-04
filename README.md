@@ -2,47 +2,36 @@
 
 Simple library for parsing command-line arguments.
 
-## Build and Run
+Latest Version : v0.1.6
+
+## Install and Build
+
+1. Download the source code for this library using git or wget.
+
+2. Build using Makefile.
+
+3. Copy `lib` directory and `include/lips.h` to your project directory.
+
+4. Create your own programs with this library.
 
 ```
-$ git clone https://github.com/yunseo-h68/lips.git
+# Using git
+## For example, git -b v0.1.0 clone
+$ git -b [LIPS VERSION] clone https://github.com/yunseo-h68/lips.git
 
-$ make example
+# Or using wget
+## For example, v0.1.0.zip
+$ wget https://github.com/yunseo-h68/lips/archive/[LIPS VERSION].zip
+$ unzip [LIPS VERSION].zip
 
-$ ./bin/example
-example | example of lips
+$ cd [LIPS SRC DIR]
+$ make
+$ cp -r lib [PROJECT LIB DIR]
+$ cp include/lips.h [PROJECT SRC DIR]/lips.h # lips.h
 
-Usage:
-	example [OPTIONS] [SUBCOMMANDS]
-
-Options:
-	-h, --help : Display this information
-	-v, --version : Display version
-	    --echo=[STRING] : Display [STRING]
-
-Subcommands:
-	hello : print 'Hello'
-	world : print 'World'
-	test  : print subcommand and other arguments
-
-
-$ ./bin/example hello
-Hello
-
-$ ./bin/example --echo='hello world'
-hello world
-
-$ ./bin/example test hello world
-
-TEST - Print other arguments(not subcommand, not options)
-- hello
-- world
-
-Subcommand : test
-
-$ ./bin/example -v
-version 0.1.6
-
+# Build with this library.
+## For example, gcc main.c -L./lib -llips
+$ gcc [.c src files] -L[PROJECT LIB DIR] -llips
 ```
 
 ## License
