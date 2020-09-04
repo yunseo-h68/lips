@@ -45,7 +45,7 @@ void print_help()
 
 void print_version() 
 {
-	printf("version 0.1.5\n");
+	printf("version 0.1.6\n");
 }
 
 void print_hello() 
