@@ -22,11 +22,14 @@ struct lips_args* init(int argc, char* argv[])
 	// Add world Subcommand
 	lips_add_subcommand(args, "world");
 
-	lips_parse_args(args, argc, argv);
+	// Add test Subcommand
+	lips_add_subcommand(args, "test");
+
 	return args;
 }
 
-void print_help() {
+void print_help() 
+{
 	printf("example | example of lips\n\n");
 	printf("Usage:\n\texample [OPTIONS] [SUBCOMMANDS]\n\n");
 	printf("Options:\n");
@@ -36,22 +39,27 @@ void print_help() {
 	printf("\n");
 	printf("Subcommands:\n");
 	printf("\thello : print 'Hello'\n");
-	printf("\tworld : print 'World'\n\n");
+	printf("\tworld : print 'World'\n");
+	printf("\ttest  : print subcommand and other arguments\n\n");
 }
 
-void print_version() {
-	printf("version 0.1.3\n");
+void print_version() 
+{
+	printf("version 0.1.5\n");
 }
 
-void print_hello() {
+void print_hello() 
+{
 	printf("Hello\n");
 }
 
-void print_world() {
+void print_world() 
+{
 	printf("World\n");
 }
 
-void option_echo(struct lips_args* args) {
+void option_echo(struct lips_args* args) 
+{
 	char* str = lips_get_option_long_value(args, "echo");
 	if (str == NULL) {
 		print_help();
@@ -60,8 +68,25 @@ void option_echo(struct lips_args* args) {
 	printf("%s\n", str);
 }
 
-int main(int argc, char* argv[]) {
+void print_other_args(struct lips_args* args)
+{
+	int i = 0; 
+	printf("\nTEST - Print other arguments(not subcommand, not options)\n");
+	for (i = 0; i < args->count_other_args; i++) {
+		printf("- %s\n", args->other_args[i]);
+	}
+}
+
+void print_subcommand(struct lips_args* args)
+{
+	printf("\nSubcommand : %s\n", args->subcommand);
+}
+
+int main(int argc, char* argv[]) 
+{
+	int i = 0;
 	struct lips_args* args = init(argc, argv);
+	lips_parse_args(args, argc, argv);
 
 	if (argc == 1) {
 		print_help();
@@ -74,6 +99,10 @@ int main(int argc, char* argv[]) {
 		return 0;
 	} else if (lips_is_exist_subcommand(args, "world")) {
 		print_world();
+		return 0;
+	} else if (lips_is_exist_subcommand(args, "test")) {
+		print_other_args(args);
+		print_subcommand(args);
 		return 0;
 	}
 
