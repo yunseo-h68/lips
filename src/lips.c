@@ -26,13 +26,13 @@ int lips_is_exist_option_long(struct lips_args* args, const char* name)
 
 int lips_is_exist_subcommand(struct lips_args* args, const char* name)
 {
-	struct lips_subcommand* subcommand = get_subcommand(args, name);
+	RETURN_ERROR_INT(args == NULL || name == NULL);
 	
-	if (subcommand == NULL) {
+	if (args->subcommand == NULL) {
 		return 0;
 	}
 
-	return subcommand->is_exist;
+	return is_subcommand(args, name) && !strcmp(name, args->subcommand);
 }
 
 int lips_add_option(struct lips_args* args, const char* name)
@@ -62,12 +62,9 @@ char* lips_get_option_long_value(struct lips_args* args, const char* name)
 	return option == NULL ? NULL : option->value;
 }
 
-void lips_parse_args(struct lips_args* args, const int argc, char* argv[])
+int lips_parse_args(struct lips_args* args, const int argc, char* argv[])
 {
-	if (args == NULL || argc == 1 || argv == NULL) {
-		return;
-	}
-	parse_args(args, argc, argv);
+	return parse_args(args, argc, argv);
 }
 
 struct lips_args* new_lips_args()

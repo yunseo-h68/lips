@@ -4,13 +4,18 @@
 
 static int set_subcommand(struct lips_args* args, const char* name)
 {
+	RETURN_ERROR_INT(args == NULL || name == NULL);
+	
 	args->subcommand = (char*)malloc(strlen(name));
 	strcpy(args->subcommand, name);
+	
 	return 0;
 }
 
 int argv_type(const char* argv)
 {
+	RETURN_ERROR_INT(argv == NULL);
+
 	if (strlen(argv) > 0 && argv[0] != '-')
 		return SUBCOMMAND;
 
@@ -33,6 +38,9 @@ char* parse_name(const char* argv, const int type)
 	char* temp = NULL;
 	int i = 0;
 	int j = 0;
+
+	RETURN_ERROR_POINTER(argv == NULL);
+	RETURN_ERROR_POINTER(type != SUBCOMMAND && !type_is_option(type) && type != OTHER_TYPE);
 
 	while (type_is_option(type) && argv[i] == '-') i++;
 	j = i;
@@ -64,6 +72,8 @@ int parse_option_value(struct lips_option* option, const char* argv)
 	int i = 0;
 	int j = 0;
 
+	RETURN_ERROR_INT(option == NULL || argv == NULL);
+
 	while (argv[i] != '=' && strlen(argv) > i) i++;
 	j = i;
 	while (strlen(argv) > j) j++;
@@ -86,9 +96,7 @@ struct lips_option* get_option(struct lips_args* args, const char* name, int opt
 {
 	int i;
 
-	if (args == NULL || name == NULL || strlen(name) == 0) {
-		return NULL;
-	}
+	RETURN_ERROR_POINTER(args == NULL || name == NULL);
 
 	for (i = 0; i < args->count_options; i++) {
 		if (args->options[i]->type == option_type &&
@@ -100,28 +108,25 @@ struct lips_option* get_option(struct lips_args* args, const char* name, int opt
 	return NULL;
 }
 
-struct lips_subcommand* get_subcommand(struct lips_args* args, const char* name)
+int is_subcommand(struct lips_args* args, const char* name)
 {
 	int i;
 
-	if (args == NULL || name == NULL || strlen(name) == 0) {
-		return NULL;
-	}
+	RETURN_ERROR_INT(args == NULL || name == NULL);
 
 	for (i = 0; i < args->count_subcommands; i++) {
-		if (!strcmp(name, args->subcommands[i]->name)) {
-			return args->subcommands[i];
+		if (!strcmp(name, args->subcommands[i])) {
+			return 1;
 		}
 	}
 
-	return NULL;
+	return 0;
 }
 
 int add_option(struct lips_args* args, const char* name, int option_type)
 {
-	if (args == NULL || strlen(name) == 0) {
-		return -1;
-	}
+	RETURN_ERROR_INT(args == NULL || name == NULL);
+	RETURN_ERROR_INT(option_type != OPTION_LONG && option_type != OPTION_SHORT);
 
 	(args->count_options)++;
 
@@ -149,33 +154,26 @@ int add_option(struct lips_args* args, const char* name, int option_type)
 }
 
 int add_subcommand(struct lips_args* args, const char* name)
-{
-	if (args == NULL || name == NULL || strlen(name) == 0) {
-		return -1;
-	}
+{	
+	RETURN_ERROR_INT(args == NULL || name == NULL);
 
 	(args->count_subcommands)++;
 
 	if (args->count_subcommands == 1) {
-		args->subcommands = (struct lips_subcommand**)malloc(sizeof(struct lips_subcommand*));
+		args->subcommands = (char**)malloc(sizeof(char*));
 	} else {
-		args->subcommands = (struct lips_subcommand**)realloc(args->subcommands, sizeof(struct lips_subcommand*) * (args->count_subcommands));
+		args->subcommands = (char**)realloc(args->subcommands, sizeof(char*) * (args->count_subcommands));
 	}
 
-	struct lips_subcommand* new_subcommand = (struct lips_subcommand*)malloc(sizeof(struct lips_subcommand));
-	new_subcommand->is_exist = 0;
-	new_subcommand->name = (char*)malloc(strlen(name) + 1);
-	strcpy(new_subcommand->name, name);
+	args->subcommands[args->count_subcommands -1] = (char*)malloc(strlen(name) + 1);
+	strcpy(args->subcommands[args->count_subcommands - 1], name);
 
-	args->subcommands[args->count_subcommands - 1] = new_subcommand;
 	return 0;
 }
 
 int add_other_args(struct lips_args* args, const char* name)
 {
-	if (args == NULL || name == NULL || strlen(name) == 0) {
-		return -1;
-	}
+	RETURN_ERROR_INT(args == NULL || name == NULL);
 
 	(args->count_other_args)++;
 
@@ -191,14 +189,14 @@ int add_other_args(struct lips_args* args, const char* name)
 	return 0;
 }
 
-void parse_args(struct lips_args* args, const int argc, char* argv[])
+int parse_args(struct lips_args* args, const int argc, char* argv[])
 {
 	int i = 0;
 	int type = 0;
-	int check_subcommand = 0;
 	char* name = NULL;
 	struct lips_option* option_temp = NULL;
-	struct lips_subcommand* subcommand_temp = NULL;
+
+	RETURN_ERROR_INT(args == NULL || argc == 1 || argv == NULL);
 
 	for (i = 1; i < argc; i++) {
 		type = argv_type(argv[i]);
@@ -216,12 +214,9 @@ void parse_args(struct lips_args* args, const int argc, char* argv[])
 				add_other_args(args, argv[i]);
 				break;
 			case SUBCOMMAND:
-				if (!check_subcommand) {
-					check_subcommand = 1;
-					subcommand_temp = get_subcommand(args, name);
-					if (subcommand_temp != NULL) {
+				if (args->subcommand == NULL) {
+					if (is_subcommand(args, name)) {
 						set_subcommand(args, name);
-						subcommand_temp->is_exist = 1;
 						break;
 					}
 				}
@@ -236,9 +231,10 @@ int free_subcommands(struct lips_args* args)
 {
 	int i = 0;
 
+	RETURN_ERROR_INT(args == NULL);
+
 	SAFE_FREE(args->subcommand);
 	for (i = 0; i < args->count_subcommands; i++) {
-		SAFE_FREE(args->subcommands[i]->name)
 		SAFE_FREE(args->subcommands[i])
 	}
 	SAFE_FREE(args->subcommands)
@@ -250,6 +246,8 @@ int free_subcommands(struct lips_args* args)
 int free_options(struct lips_args* args)
 {
 	int i = 0;
+
+	RETURN_ERROR_INT(args == NULL);
 
 	for (i = 0; i < args->count_options; i++) {
 		SAFE_FREE(args->options[i]->name)
@@ -268,7 +266,9 @@ int free_options(struct lips_args* args)
 int free_other_args(struct lips_args* args)
 {
 	int i = 0;
-	
+
+	RETURN_ERROR_INT(args == NULL);
+
 	for (i = 0; i <args->count_other_args; i++) {
 		SAFE_FREE(args->other_args[i])
 	}

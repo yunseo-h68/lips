@@ -2,6 +2,8 @@
 #define LIPS_CORE_H
 
 #define SAFE_FREE(p) {if(p!=NULL){free(p);p=NULL;}}
+#define RETURN_ERROR_INT(condition) {if(condition){return -1;}}
+#define RETURN_ERROR_POINTER(condition) {if(condition){return NULL;}}
 
 #define OTHER_TYPE   3
 #define SUBCOMMAND   2
@@ -15,11 +17,6 @@ struct lips_option {
 	char* value;
 };
 
-struct lips_subcommand {
-	int is_exist;
-	char* name;
-};
-
 struct lips_args {
 	int count_options;
 	int count_options_long;
@@ -31,7 +28,7 @@ struct lips_args {
 	char** other_args;
 
 	struct lips_option** options;
-	struct lips_subcommand** subcommands;
+	char** subcommands;
 };
 
 static int set_subcommand(struct lips_args* args, const char* name);
@@ -43,13 +40,13 @@ char* parse_name(const char* argv, const int type);
 int parse_option_value(struct lips_option* option, const char* argv);
 
 struct lips_option* get_option(struct lips_args* args, const char* name, int option_type);
-struct lips_subcommand* get_subcommand(struct lips_args* args, const char* name);
+int is_subcommand(struct lips_args* args, const char* name);
 
 int add_option(struct lips_args* args, const char* name, int option_type);
 int add_subcommand(struct lips_args* args, const char* name);
 int add_other_args(struct lips_args* args, const char* name);
 
-void parse_args(struct lips_args* args, const int argc, char* argv[]);
+int parse_args(struct lips_args* args, const int argc, char* argv[]);
 
 int free_subcommands(struct lips_args* args);
 int free_options(struct lips_args* args);
