@@ -27,12 +27,7 @@ int lips_is_exist_option_long(struct lips_args* args, const char* name)
 int lips_is_exist_subcommand(struct lips_args* args, const char* name)
 {
 	RETURN_ERROR_INT(args == NULL || name == NULL);
-	
-	if (args->subcommand == NULL) {
-		return 0;
-	}
-
-	return is_subcommand(args, name) && !strcmp(name, args->subcommand);
+	return args->subcommand != NULL && !strcmp(name, args->subcommand);
 }
 
 int lips_add_option(struct lips_args* args, const char* name)
