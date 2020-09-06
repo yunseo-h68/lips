@@ -1,7 +1,7 @@
 CC                = gcc
 LIB_NAME          = lips
 LIB_TARGET        = lib$(LIB_NAME)
-LIB_VERSION       = 0.1.6
+LIB_VERSION       = 1.0.0
 LIB_VERSION_MAJOR = 0
 LIB_DIR           = lib
 SRC_DIR           = src
