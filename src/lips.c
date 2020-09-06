@@ -62,7 +62,7 @@ char* lips_get_option_long_value(struct lips_args* args, const char* name)
 	return option == NULL ? NULL : option->value;
 }
 
-char* lips_get_other(struct lips_args* args)
+char** lips_get_other(struct lips_args* args)
 {
 	RETURN_ERROR_POINTER(args == NULL);
 	return args->other_args;
